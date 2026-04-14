@@ -1,0 +1,10 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": "./AGENTS.md",
+  "commands": {
+    "HARNESS": {
+      "description": "Initialize a new harness project",
+      "script": "bun scripts/init-harness.ts"
+    }
+  }
+}

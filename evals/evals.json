@@ -1,0 +1,39 @@
+{
+  "skill_name": "harness-init",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Build a harness for GIMP - I want an AI agent that can control GIMP through script-fu commands",
+      "expected_output": "Complete harness project structure for GIMP with backend wrapper, tool registry, and AGENTS.md",
+      "expectations": [
+        "Project has package.json with correct name",
+        "AGENTS.md exists with correct commands",
+        "src/tools/GimpTool/ directory created",
+        "src/utils/gimp_backend.ts created",
+        "build.ts configured"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Create a harness project for my CLI tool that wraps ffmpeg for video processing",
+      "expected_output": "Basic harness project with ffmpeg backend integration and video processing tools",
+      "expectations": [
+        "Project structure matches basic template",
+        "BashTool included for command execution",
+        "FFmpeg backend wrapper created",
+        "AGENTS.md has correct commands"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Initialize a harness with OpenAI provider support and multi-tool setup including bash, file operations, and web fetch",
+      "expected_output": "Harness project with OpenAI provider, multiple tools, and OpenCode integration",
+      "expectations": [
+        "OpenAI provider configured in providers/",
+        "BashTool, FileReadTool, FileWriteTool, GrepTool, GlobTool, WebFetchTool all present",
+        "opencode.json created with instructions path",
+        "AGENTS.md with OpenAI configuration"
+      ]
+    }
+  ]
+}
