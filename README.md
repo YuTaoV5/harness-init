@@ -18,7 +18,8 @@ This project emerged from a brainstorming session about **large-scale codebase r
 
 > "When refactoring large codebases — kernel-level code, microservice architectures, multi-team projects, long-term maintenance systems — the core problem isn't the refactoring itself. It's **context management**. AI coding agents have bounded memory, yet refactoring requires understanding cross-file dependencies, maintaining constraint consistency, and tracking scope across thousands of files."
 
-> "在大规模代码库重构时——内核级代码、微服务架构、多团队项目、长期维护系统——核心问题不是重构本身，而是**上下文管理**。AI 编码代理的内存是有限的，而重构需要理解跨文件依赖、维护约束一致性、跟踪数千个文件的范围。"
+> "在大规模代码库重构时——内核级代码、微服务架构、多团队项目、长期维护系统——核心问题不是重构本身，而是**上下文管理**。
+> AI 编码代理的内存是有限的，而重构需要理解跨文件依赖、维护约束一致性、跟踪数千个文件的范围。"
 
 **Refactor Harness** was designed to solve this — a harness architecture that manages bounded context, enables platform-aware search, tracks refactoring scope, and detects deviations from constraints.
 
