@@ -32,13 +32,17 @@ export async function detectSearchTool(): Promise<SearchTool> {
     return 'findstr'
   }
   
-  try {
-    const { execSync } = await import('child_process')
-    execSync('rg --version', { stdio: 'ignore' })
-    return 'rg'
-  } catch {
-    return 'grep'
+  for (const tool of ['rg', 'grep'] as const) {
+    try {
+      const { execSync } = await import('child_process')
+      execSync(`${tool} --version`, { stdio: 'ignore' })
+      return tool
+    } catch {
+      continue
+    }
   }
+  
+  throw new Error('No search tool found (rg or grep)')
 }
 
 export async function searchFiles(options: SearchOptions): Promise<SearchResult[]> {
@@ -58,30 +62,56 @@ export async function searchFiles(options: SearchOptions): Promise<SearchResult[
 }
 
 function buildSearchArgs(tool: SearchTool, pattern: string, options: { include?: string; recursive?: boolean; caseSensitive?: boolean }): string[] {
-  const args: string[] = ['-n']
+  const args: string[] = []
   
-  if (options.caseSensitive === false) {
-    args.push('-i')
-  }
-  
-  if (options.include) {
-    switch (tool) {
-      case 'rg':
+  switch (tool) {
+    case 'rg':
+      args.push('-n')
+      if (options.caseSensitive === false) {
+        args.push('-i')
+      }
+      if (options.include) {
         args.push('-g', options.include)
-        break
-      case 'grep':
+      }
+      args.push(pattern)
+      if (options.recursive !== false) {
+        args.push('.')
+      }
+      break
+    case 'grep':
+      args.push('-n')
+      if (options.caseSensitive === false) {
+        args.push('-i')
+      }
+      if (options.include) {
         args.push('--include=' + options.include)
-        break
-      case 'findstr':
+      }
+      args.push(pattern)
+      if (options.recursive !== false) {
+        args.push('.')
+      }
+      break
+    case 'findstr':
+      if (options.caseSensitive === false) {
+        args.push('/i')
+      }
+      if (options.recursive !== false) {
+        args.push('/s')
+      }
+      args.push('/n')
+      // findstr needs /c for patterns with spaces
+      if (pattern.includes(' ')) {
+        args.push('/c:' + pattern)
+      } else {
+        args.push(pattern)
+      }
+      if (options.include) {
         args.push(options.include)
-        break
-    }
+      }
+      break
   }
   
-  args.push(pattern)
-  args.push(options.recursive === false ? '' : '*')
-  
-  return args.filter(Boolean)
+  return args
 }
 
 function parseSearchOutput(output: string, tool: SearchTool): SearchResult[] {
@@ -89,6 +119,7 @@ function parseSearchOutput(output: string, tool: SearchTool): SearchResult[] {
   const lines = output.split('\n').filter(Boolean)
   
   for (const line of lines) {
+    // Handle both grep/rg format (file:line:content) and findstr format
     const match = line.match(/^(.+?):(\d+):(.+)$/)
     if (match) {
       results.push({
@@ -96,6 +127,16 @@ function parseSearchOutput(output: string, tool: SearchTool): SearchResult[] {
         line: parseInt(match[2], 10),
         content: match[3].trim(),
       })
+    } else {
+      // findstr might output differently, try alternate parsing
+      const altMatch = line.match(/^(.+?)\.(\w+):(\d+):(.+)$/)
+      if (altMatch) {
+        results.push({
+          file: altMatch[1] + '.' + altMatch[2],
+          line: parseInt(altMatch[3], 10),
+          content: altMatch[4].trim(),
+        })
+      }
     }
   }
   
