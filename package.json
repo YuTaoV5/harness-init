@@ -1,0 +1,26 @@
+{
+  "name": "@harness/harness-init",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "description": "Refactor Harness skill for OpenCode - design and generate harness architecture projects",
+  "scripts": {
+    "dev": "bun run src/entrypoints/cli.ts",
+    "analyze": "bun run src/entrypoints/cli.ts --mode analyze",
+    "refactor": "bun run src/entrypoints/cli.ts --mode refactor",
+    "test": "bun test",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write ."
+  },
+  "dependencies": {
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.0",
+    "bun-types": "^1.1.0"
+  },
+  "engines": {
+    "bun": ">=1.1.0"
+  }
+}
