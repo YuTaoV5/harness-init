@@ -1,447 +1,203 @@
-# Harness Init
+# Refactor Harness / 重构工具
 
 <div align="center">
 
-**Build production-grade AI coding harnesses for any software system.**
-
-A skill for OpenCode that designs and generates complete Harness architecture projects — CLI control layers, agent frameworks, and tool systems.
+**A bounded-context memory management system for large-scale code repository refactoring.**
+**大规模代码仓库重构的有限上下文内存管理系统。**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Bun](https://img.shields.io/badge/Bun-≥1.2.0-red.svg)](https://bun.sh)
-[![OpenCode](https://img.shields.io/badge/OpenCode-Skill-blueviolet)](https://opencode.ai)
 
 </div>
 
 ---
 
-## What is a Harness?
+## Origin / 起源
 
-A **Harness** is a control layer framework that enables AI coding agents to operate software designed for humans — without needing a display or mouse.
+This project emerged from a brainstorming session about **large-scale codebase refactoring** challenges:
+
+> "When refactoring large codebases — kernel-level code, microservice architectures, multi-team projects, long-term maintenance systems — the core problem isn't the refactoring itself. It's **context management**. AI coding agents have bounded memory, yet refactoring requires understanding cross-file dependencies, maintaining constraint consistency, and tracking scope across thousands of files."
+
+> "在大规模代码库重构时——内核级代码、微服务架构、多团队项目、长期维护系统——核心问题不是重构本身，而是**上下文管理**。AI 编码代理的内存是有限的，而重构需要理解跨文件依赖、维护约束一致性、跟踪数千个文件的范围。"
+
+**Refactor Harness** was designed to solve this — a harness architecture that manages bounded context, enables platform-aware search, tracks refactoring scope, and detects deviations from constraints.
+
+**Refactor Harness** 应运而生——一种管理有限上下文、支持平台感知搜索、跟踪重构范围并检测约束偏差的工具架构。
+
+---
+
+## What It Does / 功能
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    AI Coding Agent                           │
-│         (OpenCode, Claude Code, Codex, etc.)                │
+│                    Large Codebase                             │
+│         (Kernel / Microservices / Multi-team)                │
 └──────────────────────┬────────────────────────────────────┘
-                       │ Tools (Bash, File, Grep...)
+                       │
                        ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                   Harness Framework                          │
+│                  Refactor Harness                             │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
-│  │   CLI Entry  │  │  Tool System │  │    State    │     │
-│  │   Point      │  │  (60+ tools) │  │   Store     │     │
+│  │   Context    │  │   Scope      │  │    Verify    │     │
+│  │  Collapse    │  │   Tool       │  │    Tool      │     │
+│  │  (LRU Evict) │  │ (Track files)│  │  (Deviation) │     │
 │  └──────────────┘  └──────────────┘  └──────────────┘     │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
-│  │  Query Loop  │  │  Providers   │  │ Feature Flags│     │
-│  │              │  │  (Multi-LLM) │  │              │     │
-│  └──────────────┘  └──────────────┘  └──────────────┘     │
-└──────────────────────┬────────────────────────────────────────┘
-                       │ Structured Commands
-                       ▼
-┌─────────────────────────────────────────────────────────────┐
-│              Target Software (Any GUI/CLI)                   │
-│     GIMP, Blender, LibreOffice, FFmpeg, Custom Apps...       │
+│  ┌──────────────┐  ┌──────────────┐                       │
+│  │  Platform    │  │   Project    │                       │
+│  │   Search     │  │  Knowledge   │                       │
+│  │ (rg>grep>..) │  │    Store     │                       │
+│  └──────────────┘  └──────────────┘                       │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-**Examples of what you can harness:**
+### Core Capabilities / 核心能力
 
-| Software | Backend CLI | Native Format |
-|----------|-------------|---------------|
-| GIMP | `gimp -i -b '(script-fu-...)'` | XCF |
-| Blender | `blender --background --python script.py` | .blend |
-| LibreOffice | `libreoffice --headless --convert-to` | ODF |
-| FFmpeg | `ffmpeg [args]` | Muxed media |
-| Shotcut | `melt project.mlt` | MLT XML |
-| Any CLI tool | `subprocess` calls | — |
-
----
-
-## Features
-
-### Architecture Patterns
-
-- **Layered Architecture** — Entry → Core Engine → Tool System → State → Provider
-- **Fast Path Design** — Zero-module loading for `--version`, `--help`
-- **Multi-Mode CLI** — REPL, daemon, bridge, headless modes
-- **Feature Flag System** — `import { feature } from 'bun:bundle'`
-
-### Tool System
-
-- **60+ Built-in Tools** — Bash, FileRead, FileWrite, FileEdit, Grep, Glob, WebFetch...
-- **buildTool Factory** — Standardized tool interface with Zod schemas
-- **Conditional Loading** — Feature-gated tools via `feature('FLAG')`
-- **Permission System** — Per-tool permission checks
-
-### State Management
-
-- **Zustand-style Store** — Minimal, TypeScript-native implementation
-- **Selector Pattern** — Composable state selectors
-- **Module-level Singleton** — Bootstrap state (sessionId, cwd, projectRoot)
-
-### Provider Integration
-
-- **Anthropic** — Direct API with streaming
-- **AWS Bedrock** — Claude via AWS
-- **Google Vertex** — Claude via GCP
-- **OpenAI Compatible** — Ollama, DeepSeek, vLLM
-- **Gemini Compatible** — Google AI
-
-### Dev Experience
-
-- **Bun Runtime** — Fast startup, native TypeScript
-- **Biome** — Lint + format in one tool
-- **bun:test** — Built-in test framework
-- **MACRO Defines** — Compile-time constants via `scripts/defines.ts`
+| Capability | Implementation | Purpose |
+|------------|----------------|---------|
+| **Context Management** | `ProjectKnowledgeStore` | Track refactoring scope, history, constraints in bounded memory |
+| **Context Collapse** | `ContextCollapse` | Evict old records when approaching context limits (LRU strategy) |
+| **Platform Search** | `PlatformSearch` | Auto-select optimal search tool (rg > grep > findstr) |
+| **Scope Tracking** | `ScopeTool` | Manage files in refactoring scope with status (pending/in-progress/done) |
+| **Deviation Detection** | `VerifyTool` | Detect API changes and constraint violations during refactor |
 
 ---
 
-## Installation
+## Why These Matter / 为什么重要
 
-### OpenCode
+### Context Collapse / 上下文压缩
 
-```bash
-opencode --install-skill /path/to/harness-init
+AI agents have limited context windows. When refactoring a large codebase over hours or days, the agent can't remember every decision made. **Context Collapse** uses LRU eviction to summarize old context and preserve recent decisions.
+
+**AI 代理的上下文窗口是有限的。**当在数小时或数天内重构大型代码库时，代理无法记住每个决策。**上下文压缩**使用 LRU 驱逐策略来总结旧上下文并保留最近的决策。
+
+### Platform-Aware Search / 平台感知搜索
+
+```typescript
+// On Windows: rg > findstr > dir
+// On macOS/Linux: rg > grep > find
 ```
 
-Or use the `/HARNESS` shortcut after installation.
+Ripgrep (`rg`) is **5-10x faster** than `grep` and **significantly faster** than PowerShell's `findstr`. The harness automatically detects available tools and uses the fastest one.
 
-### Manual
+Ripgrep (`rg`) 比 `grep` 快 **5-10 倍**，比 PowerShell 的 `findstr` **快得多**。工具自动检测可用工具并使用最快的工具。
 
-Copy the `harness-init` folder to your skills directory:
+### Scope Tracking / 范围跟踪
 
-| Location | Path |
-|----------|------|
-| Global | `~/.opencode/skills/` |
-| Workspace | `<project>/skills/` |
+Refactoring without scope tracking is like editing with no undo — you lose track of what's changed and what's left. ScopeTool maintains a manifest of files with their status.
+
+没有范围跟踪的重构就像没有撤销的编辑——你无法跟踪什么改变了，什么还没变。ScopeTool 维护一个文件清单及其状态。
+
+### Deviation Detection / 偏差检测
+
+Constraints like "Keep API stable" or "No breaking changes" are hard to maintain across hundreds of files. VerifyTool detects when changes violate these constraints.
+
+"保持 API 稳定"或"无破坏性更改"等约束在数百个文件中难以维护。VerifyTool 检测更改何时违反这些约束。
 
 ---
 
-## Quick Start
-
-### 1. Generate a New Harness
+## Installation / 安装
 
 ```bash
-# Basic harness
-bun scripts/init-harness.ts my-harness --template basic
+# Clone the repository
+git clone https://github.com/YuTaoV5/harness-init.git
+cd harness-init
 
-# With OpenCode integration
-bun scripts/init-harness.ts my-harness --template opencode
-
-# With Superpowers workflow
-bun scripts/init-harness.ts my-harness --template superpowers
-```
-
-### 2. Navigate to Project
-
-```bash
-cd my-harness
+# Install dependencies
 bun install
+
+# Run tests
+bun test
 ```
 
-### 3. Run Dev Mode
+### As an OpenCode Skill / 作为 OpenCode 技能
 
 ```bash
-bun run dev
-```
+# Link to OpenCode skills directory
+ln -s /path/to/harness-init ~/.opencode/skills/refactor-harness
 
-### 4. Build for Production
-
-```bash
-bun run build
+# Use via /HARNESS command in OpenCode
 ```
 
 ---
 
-## Project Structure
+## Quick Start / 快速开始
+
+### Analyze a Project / 分析项目
+
+```bash
+bun run src/entrypoints/cli.ts --mode=analyze --root=/path/to/project --constraint="Keep API stable"
+```
+
+### Start Refactor Mode / 启动重构模式
+
+```bash
+bun run src/entrypoints/cli.ts --mode=refactor --root=/path/to/project --constraint="No breaking changes"
+```
+
+### Tool Usage / 工具使用
+
+```typescript
+// ScopeTool - Manage refactoring scope
+{ action: 'add', file: 'src/kernel/foo.ts', reason: 'Core module' }
+{ action: 'list' }
+{ action: 'status', file: 'src/foo.ts', status: 'done' }
+{ action: 'remove', file: 'src/foo.ts' }
+
+// VerifyTool - Detect deviations
+{ action: 'check', constraints: ['Keep API stable'] }
+{ action: 'report' }
+{ action: 'history' }
+```
+
+---
+
+## Project Structure / 项目结构
 
 ```
-my-harness/
+harness-init/
 ├── src/
 │   ├── entrypoints/
-│   │   └── cli.ts              # CLI entry with fast paths
-│   ├── core/
-│   │   └── query.ts           # Core query loop
-│   ├── tools/
-│   │   ├── Tool.ts            # Tool interface + buildTool
-│   │   ├── tools.ts           # Tool registry
-│   │   └── BashTool/          # Individual tools
-│   ├── providers/             # LLM providers
+│   │   └── cli.ts              # CLI entry point
 │   ├── state/
-│   │   └── store.ts           # Zustand-style store
+│   │   ├── store.ts            # Zustand-style store
+│   │   └── projectKnowledgeStore.ts  # Bounded memory layer
+│   ├── memory/
+│   │   └── contextCollapse.ts  # Context eviction (LRU)
+│   ├── tools/
+│   │   ├── Tool.ts             # Tool interface
+│   │   ├── tools.ts            # Tool registry
+│   │   ├── shared/
+│   │   │   └── platformSearch.ts  # Platform-aware search
+│   │   └── RefactorTools/
+│   │       ├── ScopeTool/      # Scope management
+│   │       └── VerifyTool/     # Deviation detection
 │   └── types/
-│       └── global.d.ts        # Global types + MACRO defines
-├── scripts/
-│   ├── dev.ts                 # Dev mode launcher
-│   └── defines.ts             # MACRO definitions
+│       └── global.d.ts         # Global types
 ├── tests/
-│   └── *.test.ts              # Unit + integration tests
-├── package.json
-├── tsconfig.json
-├── biome.json                 # Lint + format config
-├── build.ts                   # Production build
-├── AGENTS.md                  # Agent instructions ←
-└── opencode.json              # OpenCode config (optional)
-```
-
----
-
-## Core Commands
-
-```bash
-bun install              # Install dependencies
-bun run dev             # Development mode
-bun run dev:inspect     # Debug mode (BUN_INSPECT=9229)
-bun run build           # Production build
-bun test                # Run tests
-bun run lint            # Check lint
-bun run lint:fix        # Auto-fix lint
-bun run format          # Format code
-```
-
----
-
-## Architecture Deep Dive
-
-### Entry Point Pattern
-
-```typescript
-// src/entrypoints/cli.ts
-export async function main() {
-  // Fast path: zero module loading
-  if (argv.version) {
-    printVersion()
-    return
-  }
-
-  // Feature-gated fast paths
-  if (argv.daemonWorker) return startDaemonWorker(argv)
-
-  // Mode dispatch
-  if (argv.daemon) return startDaemonMode()
-  if (argv.bridge) return startBridgeMode()
-
-  // Default: full CLI
-  return startREPLMode()
-}
-```
-
-### Tool Interface
-
-```typescript
-// src/tools/Tool.ts
-export type Tool<Input = AnyObject, Output = unknown> = {
-  name: string
-  inputSchema: z.ZodType
-  description(input: z.infer<Input>): Promise<string>
-  call(
-    args: z.infer<Input>,
-    context: ToolUseContext,
-    canUseTool: CanUseToolFn,
-    parentMessage: AssistantMessage,
-  ): Promise<ToolResult<Output>>
-  isEnabled?(): boolean
-  isReadOnly?(input: z.infer<Input>): boolean
-}
-
-export function buildTool<D extends ToolDef>(def: D): Tool {
-  return { ...TOOL_DEFAULTS, ...def }
-}
-```
-
-### Feature Flags
-
-```typescript
-// Enable: FEATURE_BUDDY=1 bun run dev
-import { feature } from 'bun:bundle'
-
-if (feature('BUDDY')) {
-  // Enable buddy companion
-}
-```
-
-### State Store
-
-```typescript
-// src/state/store.ts
-export function createStore<T>(
-  initialState: T,
-  onChange?: (args: { newState: T; oldState: T }) => void
-): Store<T> {
-  let state = initialState
-  const listeners = new Set<Listener>()
-
-  return {
-    getState: () => state,
-    setState: (updater) => {
-      const next = updater(state)
-      if (Object.is(next, state)) return
-      state = next
-      for (const listener of listeners) listener()
-    },
-    subscribe: (listener) => {
-      listeners.add(listener)
-      return () => listeners.delete(listener)
-    },
-  }
-}
-```
-
----
-
-## Templates
-
-### Basic
-
-Standard harness with CLI entry, query loop, Zustand store, tool registry, and Bun build config.
-
-### OpenCode (basic +)
-
-Basic template plus:
-- Pre-generated `AGENTS.md`
-- `opencode.json` configuration
-- `/HARNESS` command setup
-
-### Superpowers (opencode +)
-
-OpenCode template plus:
-- Design document generation workflow
-- Implementation plan templates
-- Git worktree integration
-- Verification checkpoints
-
----
-
-## Superpowers Workflow
-
-This skill integrates with the **Superpowers** workflow for structured AI-assisted development:
-
-```
-┌─────────────┐
-│ brainstorming │ ←── Design the harness
-└──────┬──────┘
-       │ (design approved)
-       ▼
-┌─────────────┐
-│ harness-init │ ←── Generate project (this skill)
-└──────┬──────┘
-       │ (project generated)
-       ▼
-┌─────────────┐
-│ writing-plans │ ←── Create implementation plan
-└──────┬──────┘
-       │ (plan approved)
-       ▼
-┌─────────────┐
-│ executing-plans │ ←── Execute plan tasks
-└──────┬──────┘
-       │ (all tasks complete)
-       ▼
-┌─────────────────────────┐
-│ finishing-a-development- │
-│ branch                  │
-└─────────────────────────┘
-```
-
----
-
-## Templates
-
-### Basic Template
-
-Standard harness with:
-- CLI entry point (`src/entrypoints/cli.ts`)
-- Core query loop (`src/core/query.ts`)
-- Zustand-style store (`src/state/store.ts`)
-- Tool registry (`src/tools/tools.ts`)
-- Bun build configuration (`build.ts`)
-- Biome lint/format config
-
-### OpenCode Template (basic +)
-
-Basic template plus:
-- `AGENTS.md` (pre-generated)
-- `opencode.json` (OpenCode config)
-- Superpowers integration
-- `/HARNESS` shortcut setup
-
-### Superpowers Template (opencode +)
-
-OpenCode template plus:
-- Design document generation
-- Implementation plan templates
-- Verification checkpoints
-- Git worktree integration
-
----
-
-## Example: Harness for GIMP
-
-### Generated Structure
-
-```
-gimp-harness/
-├── src/
-│   ├── entrypoints/
-│   │   └── cli.tsx
-│   ├── core/
-│   │   └── query.ts
-│   ├── tools/
-│   │   ├── BashTool/
-│   │   ├── GimpTool/          # Custom GIMP tools
-│   │   └── ...
-│   ├── state/
-│   │   └── store.ts
-│   └── utils/
-│       └── gimp_backend.ts    # Backend wrapper
-├── scripts/
-│   ├── dev.ts
-│   └── defines.ts
+│   └── unit/                   # Unit tests (22 passing)
+├── SKILL.md                    # OpenCode skill metadata
 ├── package.json
 ├── tsconfig.json
 ├── biome.json
-├── build.ts
-├── AGENTS.md
 └── README.md
 ```
 
-### Usage
+---
 
-```bash
-# Start harness
-gimp-harness --daemon
+## Goals Achieved / 达成目标
 
-# In REPL mode
-> open image.xcf
-> apply-filter resize 1920 1080
-> export output.png
-```
+| Goal | Status |
+|------|--------|
+| Bounded context management for long refactors | ✅ |
+| Platform-aware efficient search | ✅ |
+| Scope tracking for cross-file refactors | ✅ |
+| Deviation detection (verify changes against constraints) | ✅ |
+| Context collapse when approaching limits | ✅ |
+| Runnable as OpenCode skill | ✅ |
 
 ---
 
-## References
-
-Detailed documentation for specific topics:
-
-| Document | Description |
-|----------|-------------|
-| [references/architecture-guide.md](references/architecture-guide.md) | Layered architecture patterns |
-| [references/tool-implementation.md](references/tool-implementation.md) | Creating custom tools |
-| [references/provider-integration.md](references/provider-integration.md) | LLM provider adapters |
-| [references/opencode-setup.md](references/opencode-setup.md) | OpenCode integration guide |
-
----
-
-## Related Projects
-
-- **[nuwa-skill](https://github.com/alchaincyf/nuwa-skill)** — Distill any person's thinking style into an AI skill
-- **[awesome-openclaw-skills](https://github.com/VoltAgent/awesome-openclaw-skills)** — 5200+ community-built skills for AI coding agents
-- **[cli-anything](https://github.com/anomalyco/cli-anything)** — CLI wrapper methodology for GUI applications
-- **[claude-code](https://github.com/anthropics/claude-code)** — Anthropic's official AI coding agent
-
----
-
-## License
+## License / 许可证
 
 MIT — Use freely, modify endlessly.
 
@@ -449,6 +205,8 @@ MIT — Use freely, modify endlessly.
 
 <div align="center">
 
-**Build harnesses. Control any software. Ship faster.**
+**Manage context. Track scope. Detect deviations. Refactor at scale.**
+
+**管理上下文。跟踪范围。检测偏差。大规模重构。**
 
 </div>
