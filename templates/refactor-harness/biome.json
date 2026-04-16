@@ -12,7 +12,7 @@
   },
   "formatter": {
     "enabled": true,
-    "indentStyle": "2",
+    "indentStyle": "space",
     "indentWidth": 2,
     "lineWidth": 100
   }

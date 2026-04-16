@@ -15,6 +15,10 @@ import { GrepTool } from './GrepTool/index.js'
 import { GlobTool } from './GlobTool/index.js'
 import { WebFetchTool } from './WebFetchTool/index.js'
 
+// Import Refactor tools
+import { ScopeTool } from './RefactorTools/ScopeTool/index.js'
+import { VerifyTool } from './RefactorTools/VerifyTool/index.js'
+
 export { type Tool, type Tools } from './Tool.js'
 
 // Get all enabled tools
@@ -28,6 +32,10 @@ export function getAllTools(): Tool[] {
     GrepTool,
     GlobTool,
     WebFetchTool,
+
+    // Refactor tools
+    ScopeTool,
+    VerifyTool,
   ]
 
   // Feature-gated tools
