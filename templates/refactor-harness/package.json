@@ -5,7 +5,6 @@
   "private": true,
   "scripts": {
     "dev": "bun run src/entrypoints/cli.ts",
-    "build": "bun run build.ts",
     "test": "bun test",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
