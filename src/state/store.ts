@@ -1,61 +1,61 @@
-type Listener = () => void
+type Listener = () => void;
 
 export type Store<T> = {
-  getState: () => T
-  setState: (updater: (prev: T) => T) => void
-  subscribe: (listener: Listener) => () => void
-}
+  getState: () => T;
+  setState: (updater: (prev: T) => T) => void;
+  subscribe: (listener: Listener) => () => void;
+};
 
 export function createStore<T>(
   initialState: T,
-  onChange?: (args: { newState: T; oldState: T }) => void
+  onChange?: (args: { newState: T; oldState: T }) => void,
 ): Store<T> {
-  let state = initialState
-  const listeners = new Set<Listener>()
+  let state = initialState;
+  const listeners = new Set<Listener>();
 
   return {
     getState: () => state,
 
     setState: (updater: (prev: T) => T) => {
-      const prev = state
-      const next = updater(prev)
-      if (Object.is(next, prev)) return
-      state = next
-      onChange?.({ newState: next, oldState: prev })
-      for (const listener of listeners) listener()
+      const prev = state;
+      const next = updater(prev);
+      if (Object.is(next, prev)) return;
+      state = next;
+      onChange?.({ newState: next, oldState: prev });
+      for (const listener of listeners) listener();
     },
 
     subscribe: (listener: Listener) => {
-      listeners.add(listener)
-      return () => listeners.delete(listener)
+      listeners.add(listener);
+      return () => listeners.delete(listener);
     },
-  }
+  };
 }
 
 export interface Message {
-  id: string
-  role: 'user' | 'assistant' | 'system'
-  content: string
-  timestamp: number
+  id: string;
+  role: "user" | "assistant" | "system";
+  content: string;
+  timestamp: number;
 }
 
 export interface Session {
-  id: string
-  model: string
-  createdAt: number
+  id: string;
+  model: string;
+  createdAt: number;
 }
 
 export interface Tool {
-  name: string
-  description: string
+  name: string;
+  description: string;
 }
 
 export interface AppState {
-  messages: Message[]
-  tools: Tool[]
-  session: Session
-  isLoading: boolean
-  error: string | null
+  messages: Message[];
+  tools: Tool[];
+  session: Session;
+  isLoading: boolean;
+  error: string | null;
 }
 
 export function createDefaultState(): AppState {
@@ -64,12 +64,12 @@ export function createDefaultState(): AppState {
     tools: [],
     session: {
       id: crypto.randomUUID(),
-      model: 'claude-sonnet-4-20250514',
+      model: "claude-sonnet-4-20250514",
       createdAt: Date.now(),
     },
     isLoading: false,
     error: null,
-  }
+  };
 }
 
-export const useStore = createStore<AppState>(createDefaultState())
+export const useStore = createStore<AppState>(createDefaultState());

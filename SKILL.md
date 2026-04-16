@@ -1,11 +1,37 @@
 ---
 name: harness-init
-description: "Design and generate a complete Harness architecture project for any software system using Refactor Harness architecture. Use when building AI coding harnesses, CLI control layers, or agent frameworks. Triggers on: build a harness, create harness for project, initialize harness architecture, set up agent framework, design CLI control layer, /HARNESS command. Works after brainstorming — uses approved design to generate the full project."
+description: "Build a Refactor Harness for large codebase refactoring. Use when: user wants to refactor a large codebase, mentions /HARNESS command, needs scope tracking and deviation detection for cross-file refactors, or needs bounded context management for long-running refactors. Creates a runnable harness with Context Collapse, ScopeTool, VerifyTool, and PlatformSearch."
 ---
 
-# Harness Init
+# Refactor Harness
 
-Design and generate a complete Harness architecture project using **Refactor Harness** — a bounded-context memory management system optimized for large-scale code repository refactoring.
+A bounded-context memory management system for large-scale code repository refactoring. Ships as a runnable skill with Context Collapse, ScopeTool, VerifyTool, and PlatformSearch.
+
+## Installation
+
+```bash
+# Copy to OpenCode skills directory
+cp -r harness-init ~/.opencode/skills/
+
+# Or link for development
+cd ~/.opencode/skills && ln -s /path/to/harness-init harness-init
+```
+
+## Usage
+
+```
+/HARNESS                      # Start Refactor Harness session
+```
+
+## Core Capabilities
+
+| Capability | Purpose |
+|------------|---------|
+| **Context Management** | Track refactoring scope, history, and constraints in bounded memory |
+| **Context Collapse** | Evict old records when approaching context limits (LRU strategy) |
+| **Platform Search** | Auto-select optimal search tool (rg > grep > findstr) |
+| **Scope Tracking** | Manage files in refactoring scope with status (pending/in-progress/done) |
+| **Deviation Detection** | Detect API changes and constraint violations during refactor |
 
 ## Architecture
 

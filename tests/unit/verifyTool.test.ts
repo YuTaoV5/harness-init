@@ -1,6 +1,6 @@
-import { describe, expect, test, beforeEach } from 'bun:test'
-import { VerifyTool } from '../../src/tools/RefactorTools/VerifyTool/index'
+import { beforeEach, describe, expect, test } from 'bun:test'
 import { createProjectKnowledgeStore } from '../../src/state/projectKnowledgeStore'
+import { VerifyTool } from '../../src/tools/RefactorTools/VerifyTool/index'
 import type { ToolUseContext } from '../../src/tools/Tool'
 
 describe('VerifyTool', () => {
